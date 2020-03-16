@@ -2,41 +2,41 @@
   <v-form ref="form" v-model="valid" :lazy-validation="false" @submit.prevent="submit">
     <v-container>
       <v-row justify="center">
-        <v-col cols="12" lg="6">
+        <v-col cols="12" md="8" lg="6">
           <v-toolbar-title class="text-center text-uppercase primary--text">{{ header }}</v-toolbar-title>
         </v-col>
       </v-row>
       <v-row v-if="info" justify="center">
-        <v-col cols="12" lg="6">
+        <v-col cols="12" md="8" lg="6">
           <info @click.prevent="info = null" :type="infoType" :message="info" />
         </v-col>
       </v-row>
       <v-row justify="center" v-for="(input, index) in inputElements" :key="index">
-        <v-col cols="12" lg="6">
+        <v-col cols="12" md="8" lg="6">
           <v-text-field
             shaped
             filled
-            :append-icon="input.hide && input.type === 'password' ? input.icon2 : input.icon"
+            :append-icon="input.hide && input.type === INPUT_TYPES.PASSWORD ? input.icon2 : input.icon"
             :label="input.label"
             :placeholder="input.placeholder"
             :required="input.required"
             :disabled="loading"
             :rules="input.rules"
-            :type="input.hide ? input.type : 'text'"
+            :type="input.hide ? input.type : INPUT_TYPES.TEXT"
             v-model="input.model"
             @focus="(info = null, phoneStatus = null)"
             @blur="input.onBlur ? input.onBlur() : null"
             :counter="input.counter"
             :maxLength="input.maxLength"
             :hint="input.hint"
-            @click:append="input.type === 'password' ? (input.hide = !input.hide) : null"
+            @click:append="input.type === INPUT_TYPES.PASSWORD ? (input.hide = !input.hide) : null"
           ></v-text-field>
           <small class="success--text mt-10n" v-if="index === 1 && phoneStatus">{{ phoneStatus }}</small>
         </v-col>
       </v-row>
 
       <v-row justify="center">
-        <v-col cols="12" lg="6">
+        <v-col cols="12" md="8" lg="6">
           <v-checkbox
             shaped
             filled
@@ -52,8 +52,8 @@
       </v-row>
 
       <v-row justify="center">
-        <v-col cols="12" lg="6">
-          <v-btn :loading="loading" color="primary" type="submit">Submit</v-btn>
+        <v-col cols="12" md="8" lg="6">
+          <v-btn :loading="loading" color="primary" type="submit">{{ SUBMIT_TEXT }}</v-btn>
         </v-col>
       </v-row>
     </v-container>
@@ -68,16 +68,20 @@ import {
   HINTS,
   NAME,
   ERROR_MESSAGES,
-  SUCCESS_MESSAGES
+  SUCCESS_MESSAGES,
+  SUBMIT_TEXT
 } from "../constants";
-import { ACCOUNT_TYPES } from "../../../constants";
+import { ACCOUNT_TYPES, INPUT_TYPES, ICONS } from "../../../constants";
 import Info from "../../../components/Info.vue";
 export default {
   name: NAME,
   components: { Info },
   data() {
     return {
-      labels: { accountType: LABELS.ACCOUNT_TYPE },
+      labels: { accountType: LABELS.ACCOUNT_TYPE, SUBMIT_TEXT },
+      INPUT_TYPES,
+      SUBMIT_TEXT,
+      ICONS,
       header: NAME,
       checked: false,
       loading: false,
@@ -91,15 +95,15 @@ export default {
           placeholder: PLACEHOLDERS.NAME,
           model: getters.name(),
           rules: [v => !!v || ERROR_MESSAGES.NAME_REQUIRED],
-          icon: "mdi-account",
+          icon: ICONS.ACCOUNT,
           required: true
         },
         {
           label: LABELS.PHONE,
           placeholder: PLACEHOLDERS.PHONE,
           model: getters.phone(),
-          icon: "mdi-phone",
-          type: "tel",
+          icon: ICONS.PHONE,
+          type: INPUT_TYPES.PHONE,
           onBlur: () => this.isNumberAvailable(),
           counter: 11,
           maxLength: 11,
@@ -118,9 +122,9 @@ export default {
           label: LABELS.PASSWORD,
           placeholder: PLACEHOLDERS.PASSWORD,
           model: getters.password(),
-          type: "password",
-          icon: "mdi-eye",
-          icon2: "mdi-eye-off",
+          type: INPUT_TYPES.PASSWORD,
+          icon: ICONS.EYE,
+          icon2: ICONS.EYE_OFF,
           hide: true,
           min: 6,
           required: true,
@@ -129,12 +133,11 @@ export default {
             v => v.length >= 6 || ERROR_MESSAGES.PASSWORD_LENGTH
           ]
         }
-      ],
+      ]
     };
   },
   computed: {
     accountType: getters.accountType,
-    codeSent: getters.codeSent
   },
   methods: {
     async isNumberAvailable() {
@@ -145,12 +148,12 @@ export default {
           this.phoneStatus = SUCCESS_MESSAGES.VALID_PHONE;
         } catch ({ message }) {
           this.inputElements[1].model = "";
-          this.infoType = 'error';
+          this.infoType = "error";
           this.info = message;
         }
       }
     },
-    setCodeSent: mutations.setCodeSent,
+
     async submit() {
       try {
         if (!this.$refs.form.validate()) return;
@@ -162,9 +165,9 @@ export default {
         mutations.setPassword(this.inputElements[2].model);
         mutations.setPhone(this.inputElements[1].model);
         await actions.register();
-        this.setCodeSent(true);
       } catch ({ message }) {
-        this.error = message;
+        this.info = message;
+        this.infoType = "error";
         this.loading = false;
       }
     }

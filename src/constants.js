@@ -91,13 +91,39 @@ export const API_HOSTS = {
 };
 
 /**
- * The key for extracting token from localstorage
+ * The keys for extracting items from localstorage
  * @constant
  */
-export const TOKEN_STORAGE_KEY = 'token';
+export const STORAGE_KEYS = {
+  TOKEN: 'token',
+  NAME: 'name',
+  ACCOUNT_TYPE: 'accountType',
+  PHONE: 'phone'
+};
 
 /**
  * Placeholder for twilio verification code
  * @constant
  */
 export const DEFAULT_VERIFICATION_CODE = '123456';
+
+/**
+ * Form input types
+ * @constant
+ */
+export const INPUT_TYPES = {
+  TEXT: 'text',
+  PASSWORD: 'password',
+  PHONE: 'tel'
+}
+
+/**
+ * Icons
+ * @constant
+ */
+export const ICONS = {
+  EYE: 'mdi-eye',
+  EYE_OFF: 'mdi-eye-off',
+  PHONE: 'mdi-phone',
+  ACCOUNT: 'mdi-account'
+}

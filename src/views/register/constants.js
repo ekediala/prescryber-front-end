@@ -26,12 +26,20 @@ export const LABELS = {
 };
 
 /**
+ * Form submit button text
+ * @constant
+ */
+export const SUBMIT_TEXT = 'Submit';
+
+/**
  * Hints for registration form fiels
  * @constant
  */
 export const HINTS = {
   PHONE: "use format: 07030000000"
 };
+
+
 
 /**
  * Failed validation messages
