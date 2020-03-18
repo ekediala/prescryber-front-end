@@ -8,12 +8,6 @@ export const ACCOUNT_TYPES = {
 };
 
 /**
- * App base url
- * @constant
- */
-export const BASE_URL = "localhost:8000/api/v1";
-
-/**
  * App UI routes
  * @constant
  */
@@ -21,7 +15,9 @@ export const UI_ROUTES = {
   HOME: "/",
   LOGIN: "/login",
   REGISTER: "/register",
-  PRESCRIPTION: "/prescription"
+  PRESCRIPTION: "/prescription",
+  EDIT_PRESCRIPTION: "/prescription/edit",
+  CREATE_PRESCRIPTION: "/prescription/create"
 };
 
 /**
@@ -38,7 +34,8 @@ export const API_ROUTES = {
   VERIFY_PHONE: "auth/verify",
   PASSWORD_RESET_SEND: "auth/password/send",
   PASSWORD_RESET: "auth/password/reset",
-  NUMBER_AVAILABLE: "auth/check"
+  EMAIL_AVAILABLE: "auth/check",
+  GET_PATIENT: "user/check"
 };
 
 /**
@@ -46,10 +43,15 @@ export const API_ROUTES = {
  * @constant
  */
 export const MESSAGES = {
-  FAILED_PHONE_CHECK:
-    "Error trying to verify phone number availability. Please try again",
-  GENERIC_ERROR: "We did something wrong.",
-  LOGOUT: 'You will be logged out of the application, continue?'
+  FAILED_EMAIL_CHECK:
+    "Error trying to verify email availability. Please try again",
+  GENERIC_ERROR: "We did something wrong. Please try again",
+  LOGOUT: "You will be logged out of the application, continue?",
+  BAD_LOGIN: "Invalid credentials",
+  INVALID_NAME: "No such patient on our platform",
+  NULL_NAME: "Cannot proceed without patient name",
+  EXPIRED_TOKEN: "Session expired, login again",
+  GENERIC_SUCCESS: "Successful done",
 };
 
 /**
@@ -65,7 +67,8 @@ export const NAV_TEXT = {
   HOME: "/",
   LOGIN: "Login",
   REGISTER: "Register",
-  LOGOUT: "Log out"
+  LOGOUT: "Log out",
+  CREATE_PRESCRIPTION: "Prescribe"
 };
 
 /**
@@ -81,13 +84,27 @@ export const NODE_ENVIRONS = {
   DEVELOPMENT: "development"
 };
 
+export const BASE_URLS = {
+  DEVELOPMENT: "localhost:8000/api/v1",
+  PRODUCTION: ""
+};
+
+/**
+ * App base url
+ * @constant
+ */
+export const BASE_URL =
+  NODE_ENV === NODE_ENVIRONS.DEVELOPMENT
+    ? BASE_URLS.DEVELOPMENT
+    : BASE_URLS.PRODUCTION;
+
 /**
  * API hosts for development and production
  * @constant
  */
 export const API_HOSTS = {
   DEVELOPMENT: "http://localhost:8000/api/v1",
-  PRODUCTION: 'https://address/api/v1'
+  PRODUCTION: "https://address/api/v1"
 };
 
 /**
@@ -95,35 +112,51 @@ export const API_HOSTS = {
  * @constant
  */
 export const STORAGE_KEYS = {
-  TOKEN: 'token',
-  NAME: 'name',
-  ACCOUNT_TYPE: 'accountType',
-  PHONE: 'phone'
+  TOKEN: "token",
+  NAME: "name",
+  ACCOUNT_TYPE: "accountType",
+  PHONE: "phone",
+  EMAIL: "email"
 };
 
 /**
  * Placeholder for twilio verification code
  * @constant
  */
-export const DEFAULT_VERIFICATION_CODE = '123456';
+export const DEFAULT_VERIFICATION_CODE = "123456";
 
 /**
  * Form input types
  * @constant
  */
 export const INPUT_TYPES = {
-  TEXT: 'text',
-  PASSWORD: 'password',
-  PHONE: 'tel'
-}
+  TEXT: "text",
+  PASSWORD: "password",
+  PHONE: "tel",
+  NUMBER: "number",
+  EMAIL: "email"
+};
 
 /**
  * Icons
  * @constant
  */
 export const ICONS = {
-  EYE: 'mdi-eye',
-  EYE_OFF: 'mdi-eye-off',
-  PHONE: 'mdi-phone',
-  ACCOUNT: 'mdi-account'
-}
+  EYE: "mdi-eye",
+  EYE_OFF: "mdi-eye-off",
+  PHONE: "mdi-phone",
+  ACCOUNT: "mdi-account",
+  QUANTITY: "mdi-numeric",
+  DRUG: "mdi-pill",
+  ADVICE: "mdi-volume-high",
+  CYCLE: "mdi-lock-reset",
+  CALENDAR: "mdi-calendar-range",
+  EMAIL: "mdi-at"
+};
+
+/**
+ * Regex patterns
+ */
+export const PATTERNS = {
+  EMAIL: /^\w+([-]?\w+)*@\w+([-]?\w+)*(\.\w{2,3})+$/
+};

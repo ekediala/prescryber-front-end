@@ -32,14 +32,22 @@
                   :counter="input.counter"
                   :maxLength="input.maxLength"
                   :hint="input.hint"
+                  @focus="info = null"
                   @click:append="input.type === INPUT_TYPES.PASSWORD ? (input.hide = !input.hide) : null"
                 ></v-text-field>
               </v-col>
             </v-row>
-
             <v-row justify="center">
               <v-col cols="12" lg="6" md="8">
                 <v-btn :loading="loading" color="primary" type="submit">{{ SUBMIT_TEXT }}</v-btn>
+              </v-col>
+            </v-row>
+            <v-row justify="center">
+              <v-col cols="12" lg="6" md="8">
+                <p>
+                  Not registered, sign up 
+                  <router-link :to="REGISTER_LINK" class="body-1">here</router-link>
+                </p>
               </v-col>
             </v-row>
           </v-container>
@@ -54,13 +62,24 @@ import { mutations, getters, actions } from "../../store";
 import {
   LABELS,
   PLACEHOLDERS,
-  ERROR_MESSAGES,
   HINTS,
   SUBMIT_TEXT
 } from "../register/constants";
-import { INPUT_TYPES, ICONS } from "../../constants";
+import { INPUT_TYPES, ICONS, UI_ROUTES } from "../../constants";
 import { NAME } from "./constants";
 import Info from "../../components/Info.vue";
+import { RULES } from "../../validators";
+
+const { PASSWORD: TYPE_PASSWORD, EMAIL: TYPE_EMAIL } = INPUT_TYPES;
+const { EMAIL: EMAIL_HINT } = HINTS;
+const { EYE_OFF, EYE, EMAIL: EMAIL_ICON } = ICONS;
+const { PASSWORD: PASSWORD_LABEL, EMAIL: EMAIL_LABEL } = LABELS;
+const { PASSWORD: PASSWORD_RULES, EMAIL: EMAIL_RULES } = RULES;
+const {
+  PASSWORD: PASSWORD_PLACEHOLDER,
+  EMAIL: EMAIL_PLACEHOLDER
+} = PLACEHOLDERS;
+const { REGISTER } = UI_ROUTES;
 export default {
   name: NAME,
   components: { Info },
@@ -69,44 +88,33 @@ export default {
       loading: false,
       info: null,
       type: null,
+      REGISTER_LINK: REGISTER,
       NAME,
       INPUT_TYPES,
       ICONS,
       SUBMIT_TEXT,
       inputElements: [
         {
-          label: LABELS.PHONE,
-          placeholder: PLACEHOLDERS.PHONE,
-          model: getters.phone(),
-          icon: ICONS.PHONE,
-          type: INPUT_TYPES.PHONE,
-          counter: 11,
-          maxLength: 11,
+          label: EMAIL_LABEL,
+          placeholder: EMAIL_PLACEHOLDER,
+          model: getters.email(),
+          icon: EMAIL_ICON,
+          type: TYPE_EMAIL,
           required: true,
-          hint: HINTS.PHONE,
-          rules: [
-            v => !!v || ERROR_MESSAGES.PHONE_REQUIRED,
-            v => v.length === 11 || ERROR_MESSAGES.PHONE_LENGTH,
-            v => {
-              const pattern = /^0\d{10}/;
-              return pattern.test(v) || ERROR_MESSAGES.PHONE_INVALID;
-            }
-          ]
+          hint: EMAIL_HINT,
+          rules: EMAIL_RULES
         },
         {
-          label: LABELS.PASSWORD,
-          placeholder: PLACEHOLDERS.PASSWORD,
+          label: PASSWORD_LABEL,
+          placeholder: PASSWORD_PLACEHOLDER,
           model: getters.password(),
-          type: INPUT_TYPES.PASSWORD,
-          icon: ICONS.EYE,
-          icon2: ICONS.EYE_OFF,
+          type: TYPE_PASSWORD,
+          icon: EYE,
+          icon2: EYE_OFF,
           hide: true,
           min: 6,
           required: true,
-          rules: [
-            v => !!v || ERROR_MESSAGES.PASSWORD_REQUIRED,
-            v => v.length >= 6 || ERROR_MESSAGES.PASSWORD_LENGTH
-          ]
+          rules: PASSWORD_RULES
         }
       ]
     };
@@ -115,7 +123,7 @@ export default {
     async login() {
       if (!this.$refs.loginForm.validate()) return;
       this.loading = true;
-      mutations.setPhone(this.inputElements[0].model);
+      mutations.setEmail(this.inputElements[0].model);
       mutations.setPassword(this.inputElements[1].model);
       try {
         await actions.login();

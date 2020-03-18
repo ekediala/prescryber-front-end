@@ -11,7 +11,8 @@ export const NAME = "Register";
 export const PLACEHOLDERS = {
   PASSWORD: "******",
   NAME: "John Doe",
-  PHONE: "07030000000"
+  PHONE: "07030000000",
+  EMAIL: 'john@doe.com'
 };
 
 /**
@@ -22,7 +23,8 @@ export const LABELS = {
   PASSWORD: "Password",
   NAME: "Name",
   PHONE: "Phone",
-  ACCOUNT_TYPE: "Mark if you are a doctor"
+  ACCOUNT_TYPE: "Mark if you are a doctor",
+  EMAIL: 'Email'
 };
 
 /**
@@ -36,7 +38,8 @@ export const SUBMIT_TEXT = 'Submit';
  * @constant
  */
 export const HINTS = {
-  PHONE: "use format: 07030000000"
+  PHONE: "use format: 07030000000",
+  EMAIL: "use format: john@doe.com"
 };
 
 
@@ -52,6 +55,11 @@ export const ERROR_MESSAGES = {
   PHONE_INVALID: "Invalid phone number format",
   PASSWORD_REQUIRED: "Password is required",
   PASSWORD_LENGTH: "Password must be at least 6 characters long",
+  PRESCRIPTION_REQUIRED: 'Name of prescription is required',
+  QUANTITY_REQUIRED: 'Qty to be taken is required',
+  QUANTITY_NOT_ZERO: 'Qty to be taken cannot be less than zero',
+  EMAIL_REQUIRED: 'Email field is required',
+  INVALID_EMAIL: 'Invalid email'
 };
 
 /**
@@ -59,5 +67,5 @@ export const ERROR_MESSAGES = {
  * @constant
  */
 export const SUCCESS_MESSAGES = {
-  VALID_PHONE: "Phone number available"
+  VALID_EMAIL: "Email available"
 };

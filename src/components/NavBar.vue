@@ -2,19 +2,26 @@
   <v-app-bar app color="primary" dark>
     <div class="d-flex align-center">
       <router-link class="nav-link" to="/" v-if="!loggedIn">
-        <h3>{{appName | uppercase}}</h3>
+        <h3>{{APP_NAME | uppercase}}</h3>
       </router-link>
-      <span v-else class="mr-2 nav-link">{{ name }}</span>
+      <router-link class="nav-link" to="/" v-else>
+        <span class="mr-2 nav-link">{{ name }}</span>
+      </router-link>
     </div>
 
     <v-spacer></v-spacer>
 
     <div v-if="!loggedIn">
-      <router-link class="mr-2 nav-link" :to="routes.LOGIN">{{ LOGIN | uppercase }}</router-link>
-      <router-link :to="routes.REGISTER" class="mr-2 nav-link">{{ REGISTER | uppercase }}</router-link>
+      <router-link class="mr-2 nav-link" :to="LOGIN_ROUTE">{{ LOGIN | uppercase }}</router-link>
+      <router-link :to="REGISTER_ROUTE" class="mr-2 nav-link">{{ REGISTER | uppercase }}</router-link>
     </div>
 
     <div v-else>
+      <router-link
+        v-if="isPrescriber"
+        class="mr-2 nav-link"
+        :to="CREATE_PRESCRIPTION_ROUTE"
+      >{{ CREATE_PRESCRIPTION }}</router-link>
       <v-btn color="red lighten-1" @click="logout()" text>
         <span class="mr-2">{{ LOGOUT | uppercase }}</span>
       </v-btn>
@@ -23,15 +30,25 @@
 </template>
 
 <script>
-import { UI_ROUTES, APP_NAME, NAV_TEXT } from "../constants";
+import { UI_ROUTES, APP_NAME, NAV_TEXT, ACCOUNT_TYPES } from "../constants";
 import { getters, actions } from "../store";
+
+const {
+  LOGIN: LOGIN_ROUTE,
+  REGISTER: REGISTER_ROUTE,
+  CREATE_PRESCRIPTION: CREATE_PRESCRIPTION_ROUTE
+} = UI_ROUTES;
+const { PRESCRIBER } = ACCOUNT_TYPES;
+
 export default {
   name: "NavBar",
   data() {
     return {
-      routes: { ...UI_ROUTES },
+      LOGIN_ROUTE,
       ...NAV_TEXT,
-      appName: APP_NAME
+      APP_NAME,
+      REGISTER_ROUTE,
+      CREATE_PRESCRIPTION_ROUTE
     };
   },
 
@@ -39,7 +56,8 @@ export default {
     name: () => {
       return `Hi, ${getters.name()}`;
     },
-    loggedIn: getters.loggedIn
+    loggedIn: getters.loggedIn,
+    isPrescriber: () => getters.accountType() === PRESCRIBER
   },
 
   methods: {

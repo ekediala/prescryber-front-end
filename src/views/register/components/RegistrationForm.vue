@@ -24,14 +24,14 @@
             :rules="input.rules"
             :type="input.hide ? input.type : INPUT_TYPES.TEXT"
             v-model="input.model"
-            @focus="(info = null, phoneStatus = null)"
+            @focus="(info = null, emailStatus = null)"
             @blur="input.onBlur ? input.onBlur() : null"
             :counter="input.counter"
             :maxLength="input.maxLength"
             :hint="input.hint"
             @click:append="input.type === INPUT_TYPES.PASSWORD ? (input.hide = !input.hide) : null"
           ></v-text-field>
-          <small class="success--text mt-10n" v-if="index === 1 && phoneStatus">{{ phoneStatus }}</small>
+          <small class="success--text mt-10n" v-if="index === 1 && emailStatus">{{ emailStatus }}</small>
         </v-col>
       </v-row>
 
@@ -50,12 +50,16 @@
           ></v-checkbox>
         </v-col>
       </v-row>
-
       <v-row justify="center">
         <v-col cols="12" md="8" lg="6">
           <v-btn :loading="loading" color="primary" type="submit">{{ SUBMIT_TEXT }}</v-btn>
+          <p class="mt-2">
+            Registered?
+            <router-link :to="LOGIN_LINK" class="body-1">Login</router-link>
+          </p>
         </v-col>
       </v-row>
+      <v-row justify="center"></v-row>
     </v-container>
   </v-form>
 </template>
@@ -67,20 +71,48 @@ import {
   PLACEHOLDERS,
   HINTS,
   NAME,
-  ERROR_MESSAGES,
   SUCCESS_MESSAGES,
   SUBMIT_TEXT
 } from "../constants";
-import { ACCOUNT_TYPES, INPUT_TYPES, ICONS } from "../../../constants";
+import {
+  ACCOUNT_TYPES,
+  INPUT_TYPES,
+  ICONS,
+  UI_ROUTES,
+  PATTERNS
+} from "../../../constants";
 import Info from "../../../components/Info.vue";
+import { RULES } from "../../../validators/index";
+
+const { EMAIL: EMAIL_PATTERN } = PATTERNS;
+const { LOGIN } = UI_ROUTES;
+const { ACCOUNT, EYE, EYE_OFF, EMAIL: EMAIL_ICON } = ICONS;
+const { PASSWORD: PASSWORD_RULE, NAME: NAME_RULE, EMAIL: EMAIL_RULE } = RULES;
+const {
+  NAME: NAME_LABEL,
+  PASSWORD: PASSWORD_LABEL,
+  ACCOUNT_TYPE,
+  EMAIL: EMAIL_LABEL
+} = LABELS;
+const { PRESCRIBER } = ACCOUNT_TYPES;
+const { VALID_EMAIL } = SUCCESS_MESSAGES;
+const {
+  NAME: NAME_PLACEHOLDER,
+  PASSWORD: PASSWORD_PLACEHOLDER,
+  EMAIL: EMAIL_PLACEHOLDER
+} = PLACEHOLDERS;
+const { PASSWORD: TYPE_PASSWORD, EMAIL: TYPE_EMAIL } = INPUT_TYPES;
+const { EMAIL: EMAIL_HINT } = HINTS;
+
 export default {
   name: NAME,
   components: { Info },
   data() {
     return {
-      labels: { accountType: LABELS.ACCOUNT_TYPE, SUBMIT_TEXT },
+      labels: { accountType: ACCOUNT_TYPE },
       INPUT_TYPES,
       SUBMIT_TEXT,
+      LOGIN_LINK: LOGIN,
       ICONS,
       header: NAME,
       checked: false,
@@ -88,64 +120,50 @@ export default {
       info: null,
       valid: true,
       infoType: null,
-      phoneStatus: null,
+      emailStatus: null,
       inputElements: [
         {
-          label: LABELS.NAME,
-          placeholder: PLACEHOLDERS.NAME,
+          label: NAME_LABEL,
+          placeholder: NAME_PLACEHOLDER,
           model: getters.name(),
-          rules: [v => !!v || ERROR_MESSAGES.NAME_REQUIRED],
-          icon: ICONS.ACCOUNT,
+          rules: NAME_RULE,
+          icon: ACCOUNT,
           required: true
         },
         {
-          label: LABELS.PHONE,
-          placeholder: PLACEHOLDERS.PHONE,
-          model: getters.phone(),
-          icon: ICONS.PHONE,
-          type: INPUT_TYPES.PHONE,
-          onBlur: () => this.isNumberAvailable(),
-          counter: 11,
-          maxLength: 11,
+          label: EMAIL_LABEL,
+          placeholder: EMAIL_PLACEHOLDER,
+          model: getters.email(),
+          icon: EMAIL_ICON,
+          type: TYPE_EMAIL,
+          onBlur: () => this.isEmailAvailable(),
           required: true,
-          hint: HINTS.PHONE,
-          rules: [
-            v => !!v || ERROR_MESSAGES.PHONE_REQUIRED,
-            v => v.length === 11 || ERROR_MESSAGES.PHONE_LENGTH,
-            v => {
-              const pattern = /^0\d{10}/;
-              return pattern.test(v) || ERROR_MESSAGES.PHONE_INVALID;
-            }
-          ]
+          hint: EMAIL_HINT,
+          rules: EMAIL_RULE
         },
         {
-          label: LABELS.PASSWORD,
-          placeholder: PLACEHOLDERS.PASSWORD,
+          label: PASSWORD_LABEL,
+          placeholder: PASSWORD_PLACEHOLDER,
           model: getters.password(),
-          type: INPUT_TYPES.PASSWORD,
-          icon: ICONS.EYE,
-          icon2: ICONS.EYE_OFF,
+          type: TYPE_PASSWORD,
+          icon: EYE,
+          icon2: EYE_OFF,
           hide: true,
           min: 6,
           required: true,
-          rules: [
-            v => !!v || ERROR_MESSAGES.PASSWORD_REQUIRED,
-            v => v.length >= 6 || ERROR_MESSAGES.PASSWORD_LENGTH
-          ]
+          rules: PASSWORD_RULE
         }
       ]
     };
   },
-  computed: {
-    accountType: getters.accountType,
-  },
   methods: {
-    async isNumberAvailable() {
-      if (/^0\d{10}/.test(this.inputElements[1].model)) {
+    async isEmailAvailable() {
+      const email = this.inputElements[1].model;
+      if (EMAIL_PATTERN.test(email)) {
         // valid phone number
         try {
-          await actions.checkNumberAvailable(this.inputElements[1].model);
-          this.phoneStatus = SUCCESS_MESSAGES.VALID_PHONE;
+          await actions.checkEmailAvailable(email);
+          this.emailStatus = VALID_EMAIL;
         } catch ({ message }) {
           this.inputElements[1].model = "";
           this.infoType = "error";
@@ -158,12 +176,10 @@ export default {
       try {
         if (!this.$refs.form.validate()) return;
         this.loading = true;
-        this.checked
-          ? mutations.setAccountType(ACCOUNT_TYPES.PRESCRIBER)
-          : null;
+        this.checked ? mutations.setAccountType(PRESCRIBER) : null;
         mutations.setName(this.inputElements[0].model);
         mutations.setPassword(this.inputElements[2].model);
-        mutations.setPhone(this.inputElements[1].model);
+        mutations.setEmail(this.inputElements[1].model);
         await actions.register();
       } catch ({ message }) {
         this.info = message;
@@ -174,5 +190,3 @@ export default {
   }
 };
 </script>
-
-<style></style>
