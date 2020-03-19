@@ -18,8 +18,8 @@ export const UI_ROUTES = {
   PRESCRIPTION: "/prescription",
   EDIT_PRESCRIPTION: "/prescription/edit",
   CREATE_PRESCRIPTION: "/prescription/create",
-  PASSWORD_RESET: '/password/reset/:token',
-  FORGOT_PASSWORD: '/password/forgot'
+  PASSWORD_RESET: "/password/reset/:token",
+  FORGOT_PASSWORD: "/password/forgot"
 };
 
 /**
@@ -37,8 +37,7 @@ export const API_ROUTES = {
   PASSWORD_RESET_SEND: "auth/password/send",
   PASSWORD_RESET: "auth/password/reset",
   EMAIL_AVAILABLE: "auth/check",
-  GET_PATIENT: "user/check",
- 
+  GET_PATIENT: "user/check"
 };
 
 /**
@@ -54,7 +53,7 @@ export const MESSAGES = {
   INVALID_NAME: "No such patient on our platform",
   NULL_NAME: "Cannot proceed without patient name",
   EXPIRED_TOKEN: "Session expired, login again",
-  GENERIC_SUCCESS: "Successfully done",
+  GENERIC_SUCCESS: "Successfully done"
 };
 
 /**
@@ -88,8 +87,8 @@ export const NODE_ENVIRONS = {
 };
 
 export const BASE_URLS = {
-  DEVELOPMENT: "localhost:8000/api/v1",
-  PRODUCTION: ""
+  DEVELOPMENT: "localhost:8000/",
+  PRODUCTION: "https://prescryber.web.app/"
 };
 
 /**
@@ -106,8 +105,8 @@ export const BASE_URL =
  * @constant
  */
 export const API_HOSTS = {
-  DEVELOPMENT: "http://localhost:8000/api/v1",
-  PRODUCTION: "https://address/api/v1"
+  DEVELOPMENT: "http://localhost:8000/v1",
+  PRODUCTION: "https://drug-prescription-api.herokuapp.com/v1"
 };
 
 /**

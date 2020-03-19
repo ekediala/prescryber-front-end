@@ -12,7 +12,8 @@ const {
   QUANTITY_REQUIRED,
   QUANTITY_NOT_ZERO,
   EMAIL_REQUIRED,
-  INVALID_EMAIL
+  INVALID_EMAIL,
+  DATE_REQUIRED
 } = ERROR_MESSAGES;
 
 const { EMAIL: EMAL_PATTERN } = PATTERNS;
@@ -41,7 +42,5 @@ export const RULES = {
     v => !!v || EMAIL_REQUIRED,
     v => EMAL_PATTERN.test(v) || INVALID_EMAIL
   ],
-  DATE: [
-    v => !!v || 'yyyy',
-    v => new Date(v) <= Date.now() || 'yyyy']
+  DATE: [v => !!v || DATE_REQUIRED]
 };

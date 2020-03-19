@@ -59,7 +59,9 @@ export const ERROR_MESSAGES = {
   QUANTITY_REQUIRED: 'Qty to be taken is required',
   QUANTITY_NOT_ZERO: 'Qty to be taken cannot be less than zero',
   EMAIL_REQUIRED: 'Email field is required',
-  INVALID_EMAIL: 'Invalid email'
+  INVALID_EMAIL: 'Invalid email',
+  DATE_REQUIRED: 'Date is required',
+  PAST_DATE: 'Cannot choose a date in the past'
 };
 
 /**

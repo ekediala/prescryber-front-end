@@ -64,7 +64,7 @@
               <v-btn @click.prevent="remove(prescription._id)" small color="error">Delete</v-btn>
             </template>
             <v-btn
-              v-if="!prescription.filled"
+              v-if="!prescription.filled && isPatient(prescription.patientEmail) && prescription.verified"
               @click.prevent="fill(prescription)"
               small
               color="primary"

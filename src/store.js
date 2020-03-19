@@ -260,6 +260,7 @@ export const actions = {
       const { message } = response.data.data;
       return message;
     } catch (error) {
+      console.log(error);
       if (error.response)
         return Promise.reject(this.handleResponseError(error.response));
       return Promise.reject({ message: GENERIC_ERROR });
