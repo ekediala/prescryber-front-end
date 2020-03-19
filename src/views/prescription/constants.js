@@ -37,7 +37,7 @@ export const PRESCRIPTION_LABELS = {
   END_DATE: "Expected end date of prescription",
   FURTHER_ADVICE: "Further advice",
   INTERVAL: "Daily Interval",
-  EMAIL: 'Patient Email'
+  EMAIL: "Patient Email"
 };
 
 /**
@@ -49,7 +49,7 @@ export const PRESCRIPTION_HINTS = {
   QUANTITY: "Quantity patient should take at intervals",
   FURTHER_ADVICE: "Any complications, things to avoid",
   UNIT: "ml, tabs, caps",
-  INTERVAL: "No of times to be taken daily",
+  INTERVAL: "No of times to be taken daily"
 };
 
 /**
@@ -62,9 +62,4 @@ export const UNIT_VALUES = ["ml", "capsules", "tablets"];
  * Array of values for intervals dropdown
  * @constant
  */
-export const INTERVAL_VALUES = [
-  { text: "1", value: 1 },
-  { text: "2", value: 2 },
-  { text: "3", value: 3 },
-  { text: "4", value: 4 }
-];
+export const INTERVAL_VALUES = [1, 2, 3, 4];

@@ -35,7 +35,8 @@ export const API_ROUTES = {
   PASSWORD_RESET_SEND: "auth/password/send",
   PASSWORD_RESET: "auth/password/reset",
   EMAIL_AVAILABLE: "auth/check",
-  GET_PATIENT: "user/check"
+  GET_PATIENT: "user/check",
+ 
 };
 
 /**

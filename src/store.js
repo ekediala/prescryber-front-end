@@ -2,7 +2,6 @@ import {
   ACCOUNT_TYPES,
   API_HOSTS,
   API_ROUTES,
-  DEFAULT_VERIFICATION_CODE,
   MESSAGES,
   NODE_ENV,
   NODE_ENVIRONS,
@@ -10,19 +9,17 @@ import {
   UI_ROUTES
 } from "./constants";
 import {
-  NOT_FOUND,
   UNAUTHORIZED,
   UNPROCESSABLE_ENTITY
 } from "http-status-codes";
 
 import Vue from "vue";
 import api from "./config/axios.config";
-import { omit } from 'lodash';
+import { omit } from "lodash";
 import router from "./router";
 
 const {
   EMAIL_AVAILABLE,
-  VERIFY_PHONE,
   REGISTER,
   LOGIN,
   GET_PATIENT,
@@ -38,13 +35,12 @@ const {
 const { DEVELOPMENT: DEV_HOST, PRODUCTION: PROD_HOST } = API_HOSTS;
 const { DEVELOPMENT } = NODE_ENVIRONS;
 const { PATIENT } = ACCOUNT_TYPES;
-const { TOKEN, NAME, ACCOUNT_TYPE, PHONE, EMAIL } = STORAGE_KEYS;
+const { TOKEN, NAME, ACCOUNT_TYPE, EMAIL } = STORAGE_KEYS;
 const { LOGIN: LOGIN_ROUTE, HOME: INDEX_ROUTE } = UI_ROUTES;
 
 const apiUrl = NODE_ENV === DEVELOPMENT ? `${DEV_HOST}` : `${PROD_HOST}`;
 
 export const state = Vue.observable({
-  phone: localStorage.getItem(PHONE) || "",
   accountType: localStorage.getItem(ACCOUNT_TYPE) || PATIENT,
   prescription: {
     patientEmail: "",
@@ -60,11 +56,10 @@ export const state = Vue.observable({
   offline: false,
   name: localStorage.getItem(NAME) || "",
   password: "",
-  verificationCode: DEFAULT_VERIFICATION_CODE,
   loggedIn: !!localStorage.getItem(TOKEN),
-  codeSent: false,
   token: localStorage.getItem(TOKEN) || null,
-  email: localStorage.getItem(EMAIL) || ""
+  email: localStorage.getItem(EMAIL) || "",
+  allPrescriptions: []
 });
 
 export const getters = {
@@ -78,7 +73,8 @@ export const getters = {
   verificationCode: () => state.verificationCode,
   loggedIn: () => state.loggedIn,
   codeSent: () => state.codeSent,
-  token: () => state.token
+  token: () => state.token,
+  allPrescriptions: () => state.allPrescriptions
 };
 
 export const mutations = {
@@ -92,7 +88,8 @@ export const mutations = {
   setLoggedIn: status => (state.loggedIn = status),
   setCodeSent: status => (state.codeSent = status),
   setToken: token => (state.token = token),
-  setEmail: email => (state.email = email)
+  setEmail: email => (state.email = email),
+  setAllPrescriptions: prescriptions => (state.allPrescriptions = prescriptions)
 };
 
 export const actions = {
@@ -133,35 +130,9 @@ export const actions = {
       });
       return name;
     } catch (error) {
-      if (error.response) {
-        const {
-          data: { message },
-          status
-        } = error.response;
-
-        // token expired, maybe?
-        if (this.isTokenExpired(status))
-          this.invalidTokenManager(), { message };
-
-        // user not exist?
-        if (status === NOT_FOUND) return Promise.reject({ message });
-      }
-      // crazy error, send generic message
+      if (error.response)
+        return Promise.reject(this.handleResponseError(error.response));
       return Promise.reject({ message: GENERIC_ERROR });
-    }
-  },
-
-  async sendVerificationCode() {
-    // paused due to twilio trial
-    const url = `${apiUrl}/${VERIFY_PHONE}/${state.phone}`;
-    try {
-      const {
-        data: { verificationCode }
-      } = await api.get(url);
-      mutations.setCode(verificationCode);
-    } catch (error) {
-      if (error.response) return Promise.reject(error.response.data);
-      return Promise.reject(error);
     }
   },
 
@@ -257,6 +228,21 @@ export const actions = {
     router.push(INDEX_ROUTE);
   },
 
+  handleResponseError(response) {
+    const {
+      data: { message },
+      status
+    } = response;
+
+    // token expired, maybe?
+    if (this.isTokenExpired(status)) {
+      this.invalidTokenManager();
+    }
+
+    // no send back message
+    return { message };
+  },
+
   async createPrescription() {
     const config = this.getAcessToken();
     const payload = omit(getters.prescription(), ["_id", "patientName"]);
@@ -264,36 +250,34 @@ export const actions = {
     try {
       await api.post(url, payload, config);
     } catch (error) {
-      if (error.response) {
-        const {
-          data: { message },
-          status
-        } = error.response;
-
-        // token expired, maybe?
-        if (this.isTokenExpired(status))
-          this.invalidTokenManager(), { message };
-
-        return Promise.reject({ message });
-      }
+      if (error.response)
+        return Promise.reject(this.handleResponseError(error.response));
       return Promise.reject({ message: GENERIC_ERROR });
     }
   },
   async updatePrescription() {
     const config = this.getAcessToken();
-    const payload = getters.prescription();
+    const payload = omit(getters.prescription(), "__v");
     const url = `${apiUrl}/${PRESCRIPTION}`;
     try {
       await api.patch(url, payload, config);
     } catch (error) {
-      const {
-        data: { message },
-        status
-      } = error.response;
+      if (error.response)
+        return Promise.reject(this.handleResponseError(error.response));
+      return Promise.reject({ message: GENERIC_ERROR });
+    }
+  },
 
-      // token expired, maybe?
-      if (this.isTokenExpired(status)) this.invalidTokenManager(), { message };
-      // not that, send error to component
+  async loadPrescriptions() {
+    const url = `${apiUrl}/${PRESCRIPTION}`;
+    const config = this.getAcessToken();
+    try {
+      const response = await api.get(url, config);
+      const { prescriptions } = response.data.data;
+      mutations.setAllPrescriptions(prescriptions);
+    } catch (error) {
+      if (error.response)
+        return Promise.reject(this.handleResponseError(error.response));
       return Promise.reject({ message: GENERIC_ERROR });
     }
   }

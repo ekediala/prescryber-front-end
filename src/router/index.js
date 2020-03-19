@@ -1,5 +1,6 @@
-import Home from "../views/Home.vue";
-import { UI_ROUTES, ACCOUNT_TYPES } from "../constants";
+import { ACCOUNT_TYPES, UI_ROUTES } from "../constants";
+
+import Home from "../views/home/index.vue";
 import Vue from "vue";
 import VueRouter from "vue-router";
 import { getters } from "../store";

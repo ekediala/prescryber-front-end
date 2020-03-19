@@ -180,7 +180,7 @@ export default {
           placeholder: QUANTITY_PLACEHOLDER,
           hint: QUANTITY_HINT,
           icon: QUANTITY_ICON,
-          model: getters.prescription().quantity,
+          model: getters.prescription().quantity || 1,
           min: 1,
           type: TYPE_NUMBER,
           rules: QUANTITY_RULE,
@@ -201,7 +201,7 @@ export default {
           items: UNIT_VALUES,
           hint: UNIT_HINT,
           icon: QUANTITY_ICON,
-          value: 'ml',
+          value: getters.prescription().unit || "ml",
           onChange: unit =>
             mutations.setPrescription({ ...getters.prescription(), unit })
         },
@@ -209,7 +209,7 @@ export default {
           label: INTERVAL,
           items: INTERVAL_VALUES,
           hint: INTERVAL_HINT,
-          value: 1,
+          value: getters.prescription().interval || 1,
           icon: INTERVAL_ICON,
           onChange: interval =>
             mutations.setPrescription({ ...getters.prescription(), interval })
@@ -244,6 +244,7 @@ export default {
     },
     async submit() {
       if (!this.$refs.form.validate()) return;
+      this.loading = true;
       // update store
       mutations.setPrescription({
         ...getters.prescription(),
@@ -270,13 +271,14 @@ export default {
         this.type === EDIT
           ? await actions.updatePrescription()
           : await actions.createPrescription();
+        this.loading = false;
         this.infoType = "success";
         this.$refs.form.reset();
         this.info = GENERIC_SUCCESS;
       } catch (error) {
+        this.loading = false;
         this.infoType = "error";
         this.info = error.message;
-        this.inputElements.email.model = "";
       }
     }
   }
