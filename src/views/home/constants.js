@@ -3,10 +3,11 @@
  * @constant
  */
 export const CONDITIONS = {
+  ALL: "all",
+  CREATED: "created",
   FILLED: "filled",
   PENDING: "pending",
-  UNFILLED: "unfilled",
-  CREATED: "created"
+  UNFILLED: "unfilled"
 };
 
 /**
@@ -20,3 +21,9 @@ export const NAME = "Home";
  * @constant
  */
 export const HEADER = "Your Prescriptions";
+
+/**
+ * Label for sorting prescriptions
+ * @constant
+ */
+export const SORT_LABEL = "Sort prescriptions";

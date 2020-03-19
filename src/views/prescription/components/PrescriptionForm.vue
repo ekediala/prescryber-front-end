@@ -54,12 +54,12 @@
           />
         </v-col>
       </v-row>
-      <v-row justify="center">
+      <v-row  justify="center">
         <v-col cols="12" md="5">
           <v-btn
             :color="type === createType ? 'primary' : 'warning'"
-            min-width="100%"
             :loading="loading"
+            min-width="100%"
             large
             type="submit"
           >{{ type }}</v-btn>

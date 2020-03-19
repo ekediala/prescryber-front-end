@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="fill-height vld-parent">
+  <v-container fluid class="fill-height">
     <v-row justify="center">
       <v-col cols="12" md="8" lg="6">
         <v-toolbar-title class="text-center text-uppercase primary--text">{{ HEADER }}</v-toolbar-title>
@@ -11,8 +11,8 @@
         <v-select
           filled
           hide-details="auto"
-          label="Sort prescriptions"
-          :items="['all', 'filled', 'unfilled', 'pending', 'created']"
+          :label="SORT_LABEL"
+          :items="conditions"
           @change="sortBy"
         />
       </v-col>
@@ -31,7 +31,7 @@
 
     <v-row v-else-if="!!displayedPrescriptions && !displayedPrescriptions.length" justify="center">
       <v-col cols="12" md="6" lg="4">
-        <p class="text-center">Nothing here</p>
+        <p class="text-center">Nothing here. Please consult your physician.</p>
       </v-col>
     </v-row>
     <v-row v-else class="justify-md-start" justify="center">
@@ -61,10 +61,20 @@
           <v-card-actions>
             <template v-if="isCreator(prescription.prescriberEmail)">
               <v-btn @click.prevent="edit(prescription)" small color="warning">Edit</v-btn>
-              <v-btn small color="error">Delete</v-btn>
+              <v-btn @click.prevent="remove(prescription._id)" small color="error">Delete</v-btn>
             </template>
-            <v-btn v-if="!prescription.verified" small color="primary">Approve</v-btn>
-            <v-btn v-else-if="!prescription.filled" small color="primary">Mark filled</v-btn>
+            <v-btn
+              v-if="!prescription.verified"
+              @click.prevent="approve(prescription)"
+              small
+              color="primary"
+            >Approve</v-btn>
+            <v-btn
+              v-else-if="!prescription.filled"
+              @click.prevent="fill(prescription)"
+              small
+              color="primary"
+            >Mark filled</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -74,28 +84,92 @@
 
 <script>
 import { getters, actions, mutations } from "../../store";
-import { NAME, HEADER, CONDITIONS } from "./constants";
-import { UI_ROUTES } from "../../constants";
+import { NAME, HEADER, CONDITIONS, SORT_LABEL } from "./constants";
+import { UI_ROUTES, ACCOUNT_TYPES } from "../../constants";
+import Swal from "sweetalert2";
 
 const { FILLED, UNFILLED, CREATED, PENDING } = CONDITIONS;
 const { EDIT_PRESCRIPTION } = UI_ROUTES;
+const { PRESCRIBER } = ACCOUNT_TYPES;
 
 export default {
   name: NAME,
   data() {
     return {
-      error: null,
+      info: null,
       displayedPrescriptions: null,
-      CONDITIONS,
-      HEADER
+      HEADER,
+      SORT_LABEL,
+      error: null
     };
   },
+  computed: {
+    conditions: () =>
+      Object.values({
+        ...CONDITIONS,
+        CREATED: getters.accountType() === PRESCRIBER ? "created" : undefined
+      })
+  },
   methods: {
+    async approve(prescription) {
+      const payload = { ...prescription, verified: true };
+      mutations.setPrescription(payload);
+      const loader = this.$loading.show({
+        canCancel: false
+      });
+      try {
+        const response = await actions.updatePrescription();
+        loader.hide();
+        this.loadPrescriptions(response);
+      } catch ({ message }) {
+        this.info = message;
+        loader.hide();
+      }
+    },
+    async fill(prescription) {
+      const payload = { ...prescription, filled: true };
+      mutations.setPrescription(payload);
+      const loader = this.$loading.show({
+        canCancel: false
+      });
+      try {
+        const response = await actions.updatePrescription();
+        loader.hide();
+        this.loadPrescriptions(response);
+      } catch ({ message }) {
+        this.info = message;
+        loader.hide();
+      }
+    },
+    async remove(id) {
+      const approve = await Swal.fire({
+        title: "Delete",
+        text: "Prescription will be deleted",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+      });
+      if (approve.value) {
+        const loader = this.$loading.show({
+          canCancel: false
+        });
+        try {
+          const response = await actions.deletePrescription(id);
+          loader.hide();
+          this.loadPrescriptions(response);
+        } catch ({ message }) {
+          this.info = message;
+          loader.hide();
+        }
+      }
+    },
     edit(prescription) {
       mutations.setPrescription(prescription);
       this.$router.push(EDIT_PRESCRIPTION);
     },
-    async loadPrescriptions() {
+    async loadPrescriptions(message = null) {
       const loader = this.$loading.show({
         canCancel: false
       });
@@ -103,7 +177,7 @@ export default {
         await actions.loadPrescriptions();
         this.displayedPrescriptions = getters.allPrescriptions();
         loader.hide();
-        this.error = null;
+        this.info = message;
       } catch ({ message }) {
         loader.hide();
         this.error = message;
@@ -135,6 +209,7 @@ export default {
             .filter(value => value.prescriberEmail === getters.email());
           break;
         default:
+          this.displayedPrescriptions = getters.allPrescriptions();
           break;
       }
     }

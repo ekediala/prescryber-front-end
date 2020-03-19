@@ -13,6 +13,7 @@ import {
   UNPROCESSABLE_ENTITY
 } from "http-status-codes";
 
+import Swal from "sweetalert2";
 import Vue from "vue";
 import api from "./config/axios.config";
 import { omit } from "lodash";
@@ -27,7 +28,6 @@ const {
 } = API_ROUTES;
 const {
   FAILED_EMAIL_CHECK,
-  LOGOUT,
   BAD_LOGIN,
   GENERIC_ERROR,
   EXPIRED_TOKEN
@@ -165,9 +165,18 @@ export const actions = {
     if (confirm(EXPIRED_TOKEN)) this.logout();
   },
 
-  logout() {
-    const response = confirm(LOGOUT);
-    if (response) {
+  async logout() {
+    const response = await Swal.fire({
+      title: "Log out",
+      text: "You will be logged out of the app",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, log out!"
+    });
+
+    if (response.value) {
       // clear storage
       localStorage.removeItem(TOKEN);
       localStorage.removeItem(NAME);
@@ -248,7 +257,9 @@ export const actions = {
     const payload = omit(getters.prescription(), ["_id", "patientName"]);
     const url = `${apiUrl}/${PRESCRIPTION}`;
     try {
-      await api.post(url, payload, config);
+      const response = await api.post(url, payload, config);
+      const { message } = response.data.data;
+      return message;
     } catch (error) {
       if (error.response)
         return Promise.reject(this.handleResponseError(error.response));
@@ -260,7 +271,23 @@ export const actions = {
     const payload = omit(getters.prescription(), "__v");
     const url = `${apiUrl}/${PRESCRIPTION}`;
     try {
-      await api.patch(url, payload, config);
+      const response = await api.patch(url, payload, config);
+      const { message } = response.data.data;
+      return message;
+    } catch (error) {
+      if (error.response)
+        return Promise.reject(this.handleResponseError(error.response));
+      return Promise.reject({ message: GENERIC_ERROR });
+    }
+  },
+
+  async deletePrescription(id) {
+    const config = this.getAcessToken();
+    const url = `${apiUrl}/${PRESCRIPTION}`;
+    try {
+      const response = await api.delete(url, { ...config, data: { _id: id } });
+      const { message } = response.data.data;
+      return message;
     } catch (error) {
       if (error.response)
         return Promise.reject(this.handleResponseError(error.response));
@@ -275,6 +302,7 @@ export const actions = {
       const response = await api.get(url, config);
       const { prescriptions } = response.data.data;
       mutations.setAllPrescriptions(prescriptions);
+      return prescriptions;
     } catch (error) {
       if (error.response)
         return Promise.reject(this.handleResponseError(error.response));
