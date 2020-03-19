@@ -45,6 +45,10 @@
             <v-row justify="center">
               <v-col cols="12" lg="6" md="8">
                 <p>
+                  Forgot password? 
+                  <router-link :to="FORGOT_PASSWORD_LINK" class="body-1">reset password</router-link>
+                </p>
+                <p>
                   Not registered, sign up 
                   <router-link :to="REGISTER_LINK" class="body-1">here</router-link>
                 </p>
@@ -79,7 +83,7 @@ const {
   PASSWORD: PASSWORD_PLACEHOLDER,
   EMAIL: EMAIL_PLACEHOLDER
 } = PLACEHOLDERS;
-const { REGISTER } = UI_ROUTES;
+const { REGISTER, FORGOT_PASSWORD } = UI_ROUTES;
 export default {
   name: NAME,
   components: { Info },
@@ -89,6 +93,7 @@ export default {
       info: null,
       type: null,
       REGISTER_LINK: REGISTER,
+      FORGOT_PASSWORD_LINK: FORGOT_PASSWORD,
       NAME,
       INPUT_TYPES,
       ICONS,

@@ -17,7 +17,9 @@ export const UI_ROUTES = {
   REGISTER: "/register",
   PRESCRIPTION: "/prescription",
   EDIT_PRESCRIPTION: "/prescription/edit",
-  CREATE_PRESCRIPTION: "/prescription/create"
+  CREATE_PRESCRIPTION: "/prescription/create",
+  PASSWORD_RESET: '/password/reset/:token',
+  FORGOT_PASSWORD: '/password/forgot'
 };
 
 /**
@@ -52,7 +54,7 @@ export const MESSAGES = {
   INVALID_NAME: "No such patient on our platform",
   NULL_NAME: "Cannot proceed without patient name",
   EXPIRED_TOKEN: "Session expired, login again",
-  GENERIC_SUCCESS: "Successful done",
+  GENERIC_SUCCESS: "Successfully done",
 };
 
 /**

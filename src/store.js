@@ -8,10 +8,7 @@ import {
   STORAGE_KEYS,
   UI_ROUTES
 } from "./constants";
-import {
-  UNAUTHORIZED,
-  UNPROCESSABLE_ENTITY
-} from "http-status-codes";
+import { UNAUTHORIZED, UNPROCESSABLE_ENTITY } from "http-status-codes";
 
 import Swal from "sweetalert2";
 import Vue from "vue";
@@ -24,7 +21,9 @@ const {
   REGISTER,
   LOGIN,
   GET_PATIENT,
-  PRESCRIPTION
+  PRESCRIPTION,
+  PASSWORD_RESET_SEND,
+  PASSWORD_RESET
 } = API_ROUTES;
 const {
   FAILED_EMAIL_CHECK,
@@ -112,9 +111,9 @@ export const actions = {
     }
   },
 
-  getAcessToken() {
+  getAcessToken(token = null) {
     return {
-      headers: { "x-access-token": getters.token() }
+      headers: { "x-access-token": token || getters.token() }
     };
   },
 
@@ -266,6 +265,7 @@ export const actions = {
       return Promise.reject({ message: GENERIC_ERROR });
     }
   },
+
   async updatePrescription() {
     const config = this.getAcessToken();
     const payload = omit(getters.prescription(), "__v");
@@ -306,6 +306,31 @@ export const actions = {
     } catch (error) {
       if (error.response)
         return Promise.reject(this.handleResponseError(error.response));
+      return Promise.reject({ message: GENERIC_ERROR });
+    }
+  },
+
+  async resetPassword(email) {
+    try {
+      const url = `${apiUrl}/${PASSWORD_RESET_SEND}`;
+      const response = await api.post(url, { email });
+      const { message } = response.data.data;
+      return message;
+    } catch (error) {
+      if (error.response) return Promise.reject(error.response.data);
+      return Promise.reject({ message: error.message});
+    }
+  },
+
+  async updatePassword(token, password) {
+    try {
+      const url = `${apiUrl}/${PASSWORD_RESET}`;
+      const config = this.getAcessToken(token);
+      const response = await api.post(url, { password }, config);
+      const { message } = response.data.data;
+      return message;
+    } catch (error) {
+      if (error.response) return Promise.reject(error.response.data);
       return Promise.reject({ message: GENERIC_ERROR });
     }
   }

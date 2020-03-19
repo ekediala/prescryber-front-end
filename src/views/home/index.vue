@@ -64,17 +64,19 @@
               <v-btn @click.prevent="remove(prescription._id)" small color="error">Delete</v-btn>
             </template>
             <v-btn
-              v-if="!prescription.verified"
-              @click.prevent="approve(prescription)"
-              small
-              color="primary"
-            >Approve</v-btn>
-            <v-btn
-              v-else-if="!prescription.filled"
+              v-if="!prescription.filled"
               @click.prevent="fill(prescription)"
               small
               color="primary"
             >Mark filled</v-btn>
+          </v-card-actions>
+          <v-card-actions>
+            <v-btn
+              v-if="!prescription.verified && isPatient(prescription.patientEmail)"
+              @click.prevent="approve(prescription)"
+              small
+              color="success"
+            >Approve</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -104,11 +106,12 @@ export default {
     };
   },
   computed: {
-    conditions: () =>
-      Object.values({
-        ...CONDITIONS,
-        CREATED: getters.accountType() === PRESCRIBER ? "created" : undefined
-      })
+    conditions: () => {
+      if (getters.accountType() !== PRESCRIBER) delete CONDITIONS.CREATED;
+      return Object.values({
+        ...CONDITIONS
+      });
+    }
   },
   methods: {
     async approve(prescription) {
@@ -184,6 +187,10 @@ export default {
       }
     },
     isCreator(email) {
+      return getters.email() === email;
+    },
+
+    isPatient(email) {
       return getters.email() === email;
     },
     sortBy(condition) {

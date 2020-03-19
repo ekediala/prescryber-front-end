@@ -10,7 +10,9 @@ const {
   LOGIN,
   HOME,
   CREATE_PRESCRIPTION,
-  EDIT_PRESCRIPTION
+  EDIT_PRESCRIPTION,
+  PASSWORD_RESET,
+  FORGOT_PASSWORD
 } = UI_ROUTES;
 
 const { PRESCRIBER } = ACCOUNT_TYPES;
@@ -43,9 +45,15 @@ const routes = [
     }
   },
   {
-    path: "/about",
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue"),
+    path: PASSWORD_RESET,
+    component: () => import("../views/password/components/ResetPassword.vue"),
+    meta: {
+      requiresNotAuth: true
+    }
+  },
+  {
+    path: FORGOT_PASSWORD,
+    component: () => import("../views/password/components/ForgotPassword.vue"),
     meta: {
       requiresNotAuth: true
     }
@@ -64,6 +72,10 @@ const routes = [
     meta: {
       requiresAuth: false
     }
+  },
+  {
+    path: "*",
+    redirect: HOME
   }
 ];
 
