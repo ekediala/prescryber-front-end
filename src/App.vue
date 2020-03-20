@@ -2,7 +2,7 @@
   <v-app>
     <nav-bar />
     <v-content>
-      <vue-page-transition name="zoom">
+      <vue-page-transition>
         <router-view></router-view>
       </vue-page-transition>
     </v-content>

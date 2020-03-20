@@ -54,7 +54,7 @@
           />
         </v-col>
       </v-row>
-      <v-row  justify="center">
+      <v-row justify="center">
         <v-col cols="12" md="5">
           <v-btn
             :color="type === createType ? 'primary' : 'warning'"
@@ -82,7 +82,7 @@ import {
 import { LABELS, PLACEHOLDERS, HINTS } from "../../register/constants";
 import { ICONS, INPUT_TYPES, MESSAGES } from "../../../constants";
 import { RULES } from "../../../validators/index";
-import { getters, mutations, actions } from "../../../store";
+import { getters, mutations, actions, newPrescription } from "../../../store";
 const {
   ACCOUNT: ACCOUNT_ICON,
   QUANTITY: QUANTITY_ICON,
@@ -281,6 +281,9 @@ export default {
         this.info = error.message;
       }
     }
+  },
+  beforeDestroy() {
+    this.type === EDIT ? mutations.setPrescription(newPrescription) : null;
   }
 };
 </script>

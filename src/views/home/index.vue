@@ -69,8 +69,6 @@
               small
               color="primary"
             >Mark filled</v-btn>
-          </v-card-actions>
-          <v-card-actions>
             <v-btn
               v-if="!prescription.verified && isPatient(prescription.patientEmail)"
               @click.prevent="approve(prescription)"

@@ -1,10 +1,10 @@
 <template>
   <v-app-bar app color="primary" dark>
-    <div class="d-flex align-center">
-      <router-link class="nav-link" to="/" v-if="!loggedIn">
+    <div class="d-flex justify-start">
+      <v-btn text class="nav-link" href="/" v-if="!loggedIn">
         <h3>{{APP_NAME | uppercase}}</h3>
-      </router-link>
-      <router-link class="nav-link" to="/" v-else>
+      </v-btn>
+      <router-link  class="nav-link" to="/" v-else>
         <span class="mr-2 nav-link">{{ name }}</span>
       </router-link>
     </div>
@@ -19,11 +19,11 @@
     <div v-else>
       <router-link
         v-if="isPrescriber"
-        class="mr-2 nav-link"
+        class="mr-1 nav-link"
         :to="CREATE_PRESCRIPTION_ROUTE"
       >{{ CREATE_PRESCRIPTION }}</router-link>
-      <v-btn color="red lighten-1" @click="logout()" text>
-        <span class="mr-2">{{ LOGOUT | uppercase }}</span>
+      <v-btn small dense color="red lighten-1" @click="logout()" text>
+        <span class="mr-1">{{ LOGOUT | uppercase }}</span>
       </v-btn>
     </div>
   </v-app-bar>

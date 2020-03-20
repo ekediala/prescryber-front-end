@@ -39,19 +39,21 @@ const { LOGIN: LOGIN_ROUTE, HOME: INDEX_ROUTE } = UI_ROUTES;
 
 const apiUrl = NODE_ENV === DEVELOPMENT ? `${DEV_HOST}` : `${PROD_HOST}`;
 
+export const newPrescription = {
+  patientEmail: "",
+  interval: "1",
+  prescription: "",
+  furtherAdvice: "",
+  expectedDateEnd: new Date(),
+  patientName: "",
+  unit: "ml",
+  quantity: "1",
+  _id: ""
+};
+
 export const state = Vue.observable({
   accountType: localStorage.getItem(ACCOUNT_TYPE) || PATIENT,
-  prescription: {
-    patientEmail: "",
-    interval: "",
-    prescription: "",
-    furtherAdvice: "",
-    expectedDateEnd: new Date(),
-    patientName: "",
-    unit: "ml",
-    quantity: "1",
-    _id: ""
-  },
+  prescription: newPrescription,
   offline: false,
   name: localStorage.getItem(NAME) || "",
   password: "",
@@ -253,11 +255,12 @@ export const actions = {
 
   async createPrescription() {
     const config = this.getAcessToken();
-    const payload = omit(getters.prescription(), ["_id", "patientName"]);
+    const payload = omit(getters.prescription(), ["_id", "patientName"])
     const url = `${apiUrl}/${PRESCRIPTION}`;
     try {
       const response = await api.post(url, payload, config);
       const { message } = response.data.data;
+      mutations.setPrescription(newPrescription);
       return message;
     } catch (error) {
       console.log(error);
@@ -274,6 +277,7 @@ export const actions = {
     try {
       const response = await api.patch(url, payload, config);
       const { message } = response.data.data;
+      mutations.setPrescription(newPrescription);
       return message;
     } catch (error) {
       if (error.response)
