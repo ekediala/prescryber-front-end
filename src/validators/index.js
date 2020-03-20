@@ -1,5 +1,6 @@
 import { ERROR_MESSAGES } from "../views/register/constants";
 import { PATTERNS } from "../constants";
+import moment from "moment";
 
 const {
   NAME_REQUIRED,
@@ -13,7 +14,8 @@ const {
   QUANTITY_NOT_ZERO,
   EMAIL_REQUIRED,
   INVALID_EMAIL,
-  DATE_REQUIRED
+  DATE_REQUIRED,
+  PAST_DATE
 } = ERROR_MESSAGES;
 
 const { EMAIL: EMAL_PATTERN } = PATTERNS;
@@ -42,5 +44,9 @@ export const RULES = {
     v => !!v || EMAIL_REQUIRED,
     v => EMAL_PATTERN.test(v) || INVALID_EMAIL
   ],
-  DATE: [v => !!v || DATE_REQUIRED]
+  DATE: [
+    v => !!v || DATE_REQUIRED,
+    v => moment(v) > moment().subtract(1, "day") || PAST_DATE
+    
+  ]
 };

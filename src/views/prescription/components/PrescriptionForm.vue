@@ -6,7 +6,7 @@
           <v-toolbar-title class="text-center text-uppercase primary--text">{{ header }}</v-toolbar-title>
         </v-col>
       </v-row>
-      <v-row v-if="info" justify="center">
+      <v-row v-if="info" ref="info" justify="center">
         <v-col cols="12" md="8" lg="6">
           <info @click.prevent="info = null" :type="infoType" :message="info" />
         </v-col>
@@ -80,9 +80,15 @@ import {
   INTERVAL_VALUES
 } from "../constants";
 import { LABELS, PLACEHOLDERS, HINTS } from "../../register/constants";
-import { ICONS, INPUT_TYPES, MESSAGES } from "../../../constants";
+import {
+  ICONS,
+  INPUT_TYPES,
+  MESSAGES,
+  NEW_PRESCRIPTION
+} from "../../../constants";
 import { RULES } from "../../../validators/index";
-import { getters, mutations, actions, newPrescription } from "../../../store";
+import { getters, mutations, actions } from "../../../store";
+import moment from "moment";
 const {
   ACCOUNT: ACCOUNT_ICON,
   QUANTITY: QUANTITY_ICON,
@@ -103,7 +109,7 @@ const { NAME: NAME_PLACEHOLDER, EMAIL: EMAIL_PLACEHOLDER } = PLACEHOLDERS;
 const { EMAIL: EMAIL_HINT } = HINTS;
 const { EDIT, CREATE } = COMPONENT_TYPES;
 const { NAME: NAME_LABEL } = LABELS;
-const { NUMBER: TYPE_NUMBER, EMAIL: TYPE_EMAIL } = INPUT_TYPES;
+const { NUMBER: TYPE_NUMBER, EMAIL: TYPE_EMAIL, DATE: TYPE_DATE } = INPUT_TYPES;
 const {
   FURTHER_ADVICE: FURTHER_ADVICE_HINT,
   PRESCRIPTION: PRESCRIPTION_HINT,
@@ -188,10 +194,12 @@ export default {
         },
         date: {
           label: END_DATE,
-          min: new Date(),
-          model: getters.prescription().expectedDateEnd || new Date(),
+          min: moment().format("YYYY-MM-DD"),
+          model:
+            getters.prescription().expectedDateEnd ||
+            moment().format("YYYY-MM-DD"),
           icon: DATE_ICON,
-          type: "date",
+          type: TYPE_DATE,
           rules: DATE_RULE
         }
       },
@@ -221,12 +229,6 @@ export default {
         placeholder: FURTHER_ADVICE_PLACEHOLDER,
         icon: ADVICE_ICON,
         model: getters.prescription().furtherAdvice
-      },
-      endDate: {
-        label: END_DATE,
-        min: new Date(),
-        model: getters.prescription().expectedDateEnd || new Date(),
-        icon: DATE_ICON
       }
     };
   },
@@ -279,11 +281,17 @@ export default {
         this.loading = false;
         this.infoType = "error";
         this.info = error.message;
+      } finally {
+        scrollTo({
+          top: 0,
+          left: 0,
+          behavior: "smooth"
+        });
       }
     }
   },
   beforeDestroy() {
-    this.type === EDIT ? mutations.setPrescription(newPrescription) : null;
+    this.type === EDIT ? mutations.setPrescription(NEW_PRESCRIPTION) : null;
   }
 };
 </script>

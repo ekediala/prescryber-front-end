@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 /**
  * Valid account types object
  * @constant
@@ -136,7 +138,8 @@ export const INPUT_TYPES = {
   PASSWORD: "password",
   PHONE: "tel",
   NUMBER: "number",
-  EMAIL: "email"
+  EMAIL: "email",
+  DATE: 'date'
 };
 
 /**
@@ -158,7 +161,24 @@ export const ICONS = {
 
 /**
  * Regex patterns
+ * @constant
  */
 export const PATTERNS = {
   EMAIL: /^\w+([-]?\w+)*@\w+([-]?\w+)*(\.\w{2,3})+$/
+};
+
+/**
+ * Template for creating a new prescription
+ * @constant
+ */
+export const NEW_PRESCRIPTION = {
+  patientEmail: "",
+  interval: "1",
+  prescription: "",
+  furtherAdvice: "",
+  expectedDateEnd: moment().format("YYYY-MM-DD"),
+  patientName: "",
+  unit: "ml",
+  quantity: "1",
+  _id: ""
 };
