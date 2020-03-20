@@ -87,6 +87,7 @@ import { getters, actions, mutations } from "../../store";
 import { NAME, HEADER, CONDITIONS, SORT_LABEL } from "./constants";
 import { UI_ROUTES, ACCOUNT_TYPES } from "../../constants";
 import Swal from "sweetalert2";
+import { omit } from "lodash";
 
 const { FILLED, UNFILLED, CREATED, PENDING } = CONDITIONS;
 const { EDIT_PRESCRIPTION } = UI_ROUTES;
@@ -105,7 +106,8 @@ export default {
   },
   computed: {
     conditions: () => {
-      if (getters.accountType() !== PRESCRIBER) delete CONDITIONS.CREATED;
+      if (getters.accountType() !== PRESCRIBER)
+        return Object.values(omit(CONDITIONS, ["CREATED"]));
       return Object.values({
         ...CONDITIONS
       });
