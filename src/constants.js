@@ -173,12 +173,12 @@ export const PATTERNS = {
  */
 export const NEW_PRESCRIPTION = {
   patientEmail: "",
-  interval: "1",
+  interval: 1,
   prescription: "",
   furtherAdvice: "",
   expectedDateEnd: moment().format("YYYY-MM-DD"),
   patientName: "",
   unit: "ml",
-  quantity: "1",
+  quantity: 1,
   _id: ""
 };
